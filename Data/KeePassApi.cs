@@ -2,13 +2,15 @@
 using KeePassLib.Keys;
 using KeePassLib.Serialization;
 using KeePassLib.Utility;
+using KeePassWeb.Models;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace KeePassWeb.Models
+namespace KeePassWeb.Data
 {
     public class KeePassApi : IDisposable
     {
@@ -22,6 +24,14 @@ namespace KeePassWeb.Models
             var ioConnInfo = new IOConnectionInfo { Path = dbpath };
             var compKey = new CompositeKey();
             compKey.AddUserKey(new KcpPassword(masterpw));
+
+            if (!File.Exists(dbpath))
+            {
+                var newDb = new PwDatabase();
+                newDb.New(ioConnInfo, compKey);
+                newDb.Save(null);
+                newDb.Close();
+            }
 
             _db = new PwDatabase();
             _db.Open(ioConnInfo, compKey, null);

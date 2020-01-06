@@ -1,9 +1,8 @@
-﻿using KeePassWeb.Models;
+﻿using KeePassWeb.Data;
+using KeePassWeb.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 
 namespace KeePassWeb.Controllers
 {
@@ -22,18 +21,6 @@ namespace KeePassWeb.Controllers
         public IActionResult Index()
         {
             return View(_keePassApi.GetEntries());
-        }
-
-        public IActionResult UserInfo()
-        {
-            var headerValues = this.Request.Headers.Keys;
-            return Json(headerValues);
-        }
-
-        public IActionResult UserInfo2()
-        {
-            var headerValues = this.Request.Headers.FirstOrDefault(h => h.Key == "X-MS-CLIENT-PRINCIPAL-NAME").Value;
-            return Json(headerValues);
         }
 
         // GET: KeePass/Details/5
