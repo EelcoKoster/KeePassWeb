@@ -1,0 +1,61 @@
+﻿@model IEnumerable<KeePassWeb.Models.KeePassEntry>
+
+@{
+    ViewData["Title"] = "";
+}
+
+<div class="row space-below">
+    <div class="col-md-2"></div>
+    <div class="col-md-8"><input id="searchEntries" class="clearable" type="text" placeholder="Search" /></div>
+    <div class="col-md-2 new-entry"><a asp-action="Create">Create New</a></div>
+ </div>
+
+<table id="entries" class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Group)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Username)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Password)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.URL)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Group)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td class="hint" onclick="copyToClipboard('@Html.DisplayFor(modelItem => item.Username)', this)">
+                    @Html.DisplayFor(modelItem => item.Username)
+                </td>
+                <td class="hint" onclick="copyToClipboard('@Html.DisplayFor(modelItem => item.Password)', this)">
+                    ******
+                </td>
+                <td>
+                    <a href="@Html.DisplayFor(modelItem => item.URL)" target="_blank">@Html.DisplayFor(modelItem => item.URL)</a>
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
+                    @*<a asp-action="Details" asp-route-id="@item.ID">Details</a> |*@
+                    <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
