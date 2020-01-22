@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace KeePassWeb.Data
 {
@@ -42,6 +41,11 @@ namespace KeePassWeb.Data
             return GetEntries().FirstOrDefault(e => e.ID == id);
         }
 
+        public string GetEntryPassword(string id)
+        {
+            return GetEntry(id).Password;
+        }
+
         public List<KeePassEntry> GetEntries()
         {
             var kpdata = from entry in _db.RootGroup.GetEntries(true)
@@ -73,6 +77,10 @@ namespace KeePassWeb.Data
 
         public void EditEntry(KeePassEntry entry)
         {
+            if (entry.Password == "**********")
+            {
+                entry.Password = GetEntryPassword(entry.ID);
+            }
             RemoveEntry(entry.ID);
             var updateEntry = new PwEntry(false, true);
             updateEntry.Uuid = new PwUuid(MemUtil.HexStringToByteArray(entry.ID));
@@ -94,18 +102,6 @@ namespace KeePassWeb.Data
             var group = _db.RootGroup.FindGroup(entry.ParentGroup.Uuid, true);
             group.Entries.Remove(entry);
             _db.Save(null);
-        }
-
-        public string CreatePassword(int length)
-        {
-            const string valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-            StringBuilder res = new StringBuilder();
-            Random rnd = new Random();
-            while (0 < length--)
-            {
-                res.Append(valid[rnd.Next(valid.Length)]);
-            }
-            return res.ToString();
         }
 
         public void Dispose()

@@ -23,23 +23,6 @@ namespace KeePassWeb.Controllers
             return View(_keePassApi.GetEntries());
         }
 
-        // GET: KeePass/Details/5
-        public IActionResult Details(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var keePassEntry = _keePassApi.GetEntry(id);
-            if (keePassEntry == null)
-            {
-                return NotFound();
-            }
-
-            return View(keePassEntry);
-        }
-
         // GET: KeePass/Create
         public IActionResult Create()
         {
@@ -47,14 +30,13 @@ namespace KeePassWeb.Controllers
         }
 
         // POST: KeePass/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create([Bind("ID,Group,Title,Username,Password,URL,Notes")] KeePassEntry keePassEntry)
         {
             if (ModelState.IsValid)
             {
+                _logger.LogInformation($"{User.Identity.Name} added entry with Title: '{keePassEntry.Title}'");
                 _keePassApi.AddEntry(keePassEntry);
                 return RedirectToAction(nameof(Index));
             }
@@ -74,12 +56,12 @@ namespace KeePassWeb.Controllers
             {
                 return NotFound();
             }
+
+            _logger.LogInformation($"{User.Identity.Name} retrieved entry: {id} ({keePassEntry.Title})");
             return View(keePassEntry);
         }
 
         // POST: KeePass/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(string id, [Bind("ID,Group,Title,Username,Password,URL,Notes")] KeePassEntry keePassEntry)
@@ -91,6 +73,7 @@ namespace KeePassWeb.Controllers
 
             if (ModelState.IsValid)
             {
+                _logger.LogInformation($"{User.Identity.Name} updated entry: {id} ({keePassEntry.Title})");
                 _keePassApi.EditEntry(keePassEntry);
                 return RedirectToAction(nameof(Index));
             }
@@ -111,6 +94,7 @@ namespace KeePassWeb.Controllers
                 return NotFound();
             }
 
+            _logger.LogInformation($"{User.Identity.Name} will remove entry: {id} ({keePassEntry.Title})");
             return View(keePassEntry);
         }
 
@@ -119,8 +103,16 @@ namespace KeePassWeb.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(string id)
         {
+            _logger.LogInformation($"{User.Identity.Name} removed entry: {id}");
             _keePassApi.RemoveEntry(id);
             return RedirectToAction(nameof(Index));
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public string GetPassword(string id)
+        {
+            _logger.LogInformation($"{User.Identity.Name} retrieved password for id: {id}");
+            return _keePassApi.GetEntryPassword(id);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

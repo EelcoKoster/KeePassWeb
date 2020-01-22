@@ -44,15 +44,14 @@
                 <td class="hint" onclick="copyToClipboard('@Html.DisplayFor(modelItem => item.Username)', this)">
                     @Html.DisplayFor(modelItem => item.Username)
                 </td>
-                <td class="hint" onclick="copyToClipboard('@Html.DisplayFor(modelItem => item.Password)', this)">
-                    ******
+                <td class="hint" onclick="showPassword('@Html.DisplayFor(modelItem => item.ID)', this)">
+                    **********
                 </td>
                 <td>
                     <a href="@Html.DisplayFor(modelItem => item.URL)" target="_blank">@Html.DisplayFor(modelItem => item.URL)</a>
                 </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                    @*<a asp-action="Details" asp-route-id="@item.ID">Details</a> |*@
                     <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
                 </td>
             </tr>

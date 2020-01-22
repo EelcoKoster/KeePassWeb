@@ -1,25 +1,42 @@
-﻿function copyToClipboard(value, el) {
-    var textArea = document.createElement("textarea");
-    textArea.value = value;
-    var containerPos = document.getElementsByClassName("container")[0];
-    containerPos.appendChild(textArea);
-    textArea.select();
+﻿function copyToClipboard(copiedText, el) {
+    $('<textarea class="copied-text" contenteditable="true">' + copiedText + '</textarea>').appendTo('body');
 
-    try {
-        var successful = document.execCommand('copy');
-        var msg = successful ? 'successful' : 'unsuccessful';
-        console.log('Copying text command was ' + msg);
-    } catch (err) {
-        console.log('Oops, unable to copy');
+    if (navigator.userAgent.match(/ipad|iphone/i)) {
+        var range = document.createRange(),
+            textArea = $('.copied-text')[0];
+        range.selectNodeContents(textArea);
+        var selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        textArea.setSelectionRange(0, 999999);
+    } else {
+        $('.copied-text').select();
     }
 
-    containerPos.removeChild(textArea);
+    document.execCommand('copy');
+    $('.copied-text').remove();
 
     var span = document.createElement("span");
     span.className = "hinttext";
     span.innerText = 'Copied to clipboard';
     el.appendChild(span);
     el.addEventListener("mouseout", hideHint);
+}
+
+function showPassword(id, el) {
+    $.get("/Home/GetPassword/" + id, function (data) {
+        $('<td class="hint" onclick="copyToClipboard(\'' + data + '\', this)">' + data + '</td>').replaceAll(el);
+    });
+}
+
+function getPassword(id, el) {
+    if (el.value !== '**********') {
+        el.value = '**********';
+    } else {
+        $.get("/Home/GetPassword/" + id, function (data) {
+            el.value = data;
+        });
+    }
 }
 
 function hideHint() {
@@ -43,6 +60,16 @@ function filterTable(event) {
     }
 }
 
+function GeneratePassword(length, fieldName) {
+    var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%&*+-_=";
+    var randomstring = '';
+    for (var i = 0; i < length; i++) {
+        var rnum = Math.floor(Math.random() * chars.length);
+        randomstring += chars.substring(rnum, rnum + 1);
+    }
+    $('#' + fieldName).val(randomstring);
+}
+
 var searchEntries = document.querySelector('#searchEntries');
 if (searchEntries !== null) searchEntries.addEventListener('keyup', filterTable, false);
 
@@ -57,12 +84,4 @@ $(document).on('input', '.clearable', function () {
     filterTable();
 });
 
-function GeneratePassword(length, fieldName) {
-    var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%&*+-_=";
-    var randomstring = '';
-    for (var i = 0; i < length; i++) {
-        var rnum = Math.floor(Math.random() * chars.length);
-        randomstring += chars.substring(rnum, rnum + 1);
-    }
-    $('#' + fieldName).val(randomstring);
-}
+
